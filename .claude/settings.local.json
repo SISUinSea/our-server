@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/sisu/Documents/3_2/컴퓨터네트워크/team project/ourserver/src/**)",
+      "Read(//Users/sisu/Documents/3_2/컴퓨터네트워크/team project/ourserver/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
