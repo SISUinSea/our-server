@@ -59,28 +59,31 @@ public class HttpServer {
         // 6. 소켓 닫기
 
         // 구현 힌트:
-        // try (InputStream input = clientSocket.getInputStream();
-        //      OutputStream output = clientSocket.getOutputStream()) {
-        //
-        //     // 요청 파싱
-        //     HttpRequest request = RequestParser.parseRequest(input);
-        //     System.out.println("요청 받음: " + request);
-        //
-        //     // 응답 생성
-        //     HttpResponse response = new HttpResponse();
-        //     response.setStatusCode(200);
-        //     response.setStatusMessage("OK");
-        //
-        //     String htmlBody = ResponseBuilder.buildSimpleHtmlBody("Hello, World!");
-        //     response.setBody(htmlBody);
-        //
-        //     // 응답 전송
-        //     ResponseBuilder.writeResponse(response, output);
-        //     System.out.println("응답 전송 완료\n");
-        //
-        // } finally {
-        //     clientSocket.close();
-        // }
+         try (InputStream input = clientSocket.getInputStream();
+              OutputStream output = clientSocket.getOutputStream()) {
+        
+             // 요청 파싱
+             HttpRequest request = RequestParser.parseRequest(input);
+             System.out.println("요청 받음: " + request);
+        
+             // 응답 생성
+             HttpResponse response = new HttpResponse();
+             
+             //요청에 따라 응답 상태 코드 생성
+             int statusCode = CreateStatus.returnStatus(request);
+             response.setStatusCode(statusCode);
+             response.setStatusMessage(ResponseBuilder.getStatusMessage(statusCode));
+        
+             //파일 찾아서 저장
+             response.setBody(FileFinder.returnFile());
+        
+             // 응답 전송
+             ResponseBuilder.writeResponse(response, output);
+             System.out.println("응답 전송 완료\n");
+        
+         } finally {
+             clientSocket.close();
+         }
 
         System.out.println("TODO: 요청 처리 로직 구현 필요");
     }

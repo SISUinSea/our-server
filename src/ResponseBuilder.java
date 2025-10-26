@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
  * 4번 팀원: 응답 헤더 생성 (buildHeaders, writeResponse)
  */
 public class ResponseBuilder {
-
     // ============================================
     // 1번 팀원 담당 영역
     // ============================================
@@ -47,7 +46,85 @@ public class ResponseBuilder {
      */
     public static String getStatusMessage(int statusCode) {
         // TODO: 1번 팀원 구현
-        throw new UnsupportedOperationException("1번 팀원이 구현 필요");
+    	switch (statusCode) {
+    		case 100://should
+    			return "Continue";
+    		case 101://should
+    			return "Switching Protocols";
+    		case 200://must
+                return "OK";
+    		case 201://should
+    			return "Created";//주요 상태 코드
+    		case 203://should
+    			return "Non-Authoritative Information";
+    		case 204:
+    			return "No Content";
+    		case 205:
+    			return "Reset Content";
+    		case 206:
+    			return "Partial Content";
+    		case 300:
+    			return "Multiple Choices";
+    		case 301:
+    			return "Moved Permanently";
+    		case 302:
+    			return "Found";
+    		case 303:
+    			return "See Other";
+    		case 304:
+    			return "Not Modified";//주요 상태 코드
+    		case 307:
+    			return "Temporary Redirect";
+    		case 400:
+                return "Bad Request";//주요 상태 코드
+    		case 401://should
+                return "Unauthorized";
+    		case 403:
+                return "Forbidden";
+    		case 404://must
+                return "Not Found";
+    		case 405:
+                return "Method Not Allowed";
+    		case 406:
+                return "Not Acceptable";
+    		case 407:
+                return "Proxy Authentication Required";
+    		case 408:
+                return "Request Timeout";
+    		case 409:
+                return "Conflict";
+    		case 410:
+                return "Gone";
+    		case 411:
+                return "Length Required";
+    		case 412:
+                return "Precondition Failed";
+    		case 413:
+                return "Request Entity Too Large";
+    		case 414:
+                return "Request-URI Too Long";
+    		case 415:
+                return "Unsupported Media Type";
+    		case 416:
+                return "Requested Range Not Satisfiable";
+            case 417:
+                return "Expectation Failed";
+            case 500:
+                return "Internal Server Error";//주요 상태 코드
+            case 501:
+                return "Not Implemented";
+            case 502:
+                return "Bad Gateway";
+            case 503:
+                return "Service Unavailable";
+            case 504:
+                return "Gateway Timeout";
+            case 505://done
+                return "HTTP Version Not Supported";
+            default:
+                return "Unknown";
+    	}
+        //throw new UnsupportedOperationException("1번 팀원이 구현 필요");
     }
 
     /**
@@ -79,7 +156,8 @@ public class ResponseBuilder {
      */
     public static String buildStatusLine(HttpResponse response) {
         // TODO: 1번 팀원 구현
-        throw new UnsupportedOperationException("1번 팀원이 구현 필요");
+    	return String.format("HTTP/1.1 %d %s\r\n", response.getStatusCode(), getStatusMessage(response.getStatusCode()));
+        //throw new UnsupportedOperationException("1번 팀원이 구현 필요");
     }
 
     /**
@@ -114,6 +192,7 @@ public class ResponseBuilder {
      */
     public static String buildSimpleHtmlBody(String message) {
         // TODO: 1번 팀원 구현
+    	
         throw new UnsupportedOperationException("1번 팀원이 구현 필요");
     }
 
