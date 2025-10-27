@@ -170,9 +170,24 @@ public class ResponseBuilder {
      * @return 헤더 문자열
      */
     public static String buildHeaders(HttpResponse response) {
-        // TODO: 4번 팀원 구현
-        throw new UnsupportedOperationException("4번 팀원이 구현 필요");
+        String body = response.getBody();
+        if (body == null) body = "";
+        int length = body.getBytes(StandardCharsets.UTF_8).length; 
+
+        StringBuilder headers = new StringBuilder(128);
+        headers.append("Content-Type: text/html; charset=UTF-8\r\n"); 
+        headers.append("Content-Length: ").append(length).append("\r\n");
+        headers.append("Connection: close\r\n");
+        headers.append("Date: ")
+               .append(java.time.ZonedDateTime.now(java.time.ZoneOffset.UTC)
+                       .format(java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME))
+               .append("\r\n");
+        headers.append("Server: SimpleHTTP/1.0\r\n");
+        headers.append("\r\n"); 
+        return headers.toString();
     }
+
+
 
     /**
      * [4번 팀원 작업]
@@ -215,7 +230,27 @@ public class ResponseBuilder {
      */
     public static void writeResponse(HttpResponse response, OutputStream output)
             throws IOException {
-        // TODO: 4번 팀원 구현
-        throw new UnsupportedOperationException("4번 팀원이 구현 필요");
+        // 상태 라인 (1번 파트 미구현이어도 동작하게 fallback 포함)
+        String statusLine;
+        try {
+            statusLine = buildStatusLine(response); // 1번 팀원 메서드
+        } catch (Throwable t) {
+            int code = response.getStatusCode();
+            String reason;
+            try { reason = getStatusMessage(code); }
+            catch (Throwable t2) { reason = (code == 200) ? "OK" : "Unknown"; }
+            statusLine = "HTTP/1.1 " + code + " " + reason + "\r\n";
+        }
+
+        String headers = buildHeaders(response);
+        String bodyStr = response.getBody();
+        if (bodyStr == null) bodyStr = "";
+        byte[] body = bodyStr.getBytes(StandardCharsets.UTF_8);
+
+        output.write(statusLine.getBytes(StandardCharsets.UTF_8));
+        output.write(headers.getBytes(StandardCharsets.UTF_8));
+        output.write(body);
+        output.flush();
     }
+
 }
