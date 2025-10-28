@@ -50,41 +50,46 @@ public class HttpServer {
      * @throws IOException 네트워크 오류 시
      */
     private static void handleClient(Socket clientSocket) throws IOException {
-        // TODO: Day 3 통합 작업
-        // 1. InputStream, OutputStream 얻기
-        // 2. RequestParser로 요청 파싱 → HttpRequest 객체
-        // 3. 요청 내용 로그 출력
-        // 4. ResponseBuilder로 응답 생성 → HttpResponse 객체
-        // 5. 응답 전송
-        // 6. 소켓 닫기
+        try (InputStream input = clientSocket.getInputStream();
+             OutputStream output = clientSocket.getOutputStream()) {
 
-        // 구현 힌트:
-         try (InputStream input = clientSocket.getInputStream();
-              OutputStream output = clientSocket.getOutputStream()) {
-        
-             // 요청 파싱
-             HttpRequest request = RequestParser.parseRequest(input);
-             System.out.println("요청 받음: " + request);
-        
-             // 응답 생성
-             HttpResponse response = new HttpResponse();
-             
-             //요청에 따라 응답 상태 코드 생성
-             int statusCode = CreateStatus.returnStatus(request);
-             response.setStatusCode(statusCode);
-             response.setStatusMessage(ResponseBuilder.getStatusMessage(statusCode));
-             
-             //파일 찾아서 저장
-             response.setBody(FileManager.returnFile());
-        
-             // 응답 전송
-             ResponseBuilder.writeResponse(response, output);
-             System.out.println("응답 전송 완료\n");
-        
-         } finally {
-             clientSocket.close();
-         }
+            // 요청 파싱
+            HttpRequest request = RequestParser.parseRequest(input);
+            System.out.println("요청 받음: " + request);
 
-        System.out.println("TODO: 요청 처리 로직 구현 필요");
+            // 응답 생성
+            HttpResponse response = new HttpResponse();
+
+            // 요청에 따라 응답 상태 코드 생성
+            int statusCode = CreateStatus.returnStatus(request);
+            response.setStatusCode(statusCode);
+            response.setStatusMessage(ResponseBuilder.getStatusMessage(statusCode));
+
+            // 파일 찾아서 body에 저장 (200 OK일 때만)
+            if (statusCode == 200) {
+                response.setBody(FileManager.returnFile());
+            } else {
+                // 에러 페이지 생성
+                response.setBody(buildErrorPage(statusCode, ResponseBuilder.getStatusMessage(statusCode)));
+            }
+
+            // 응답 전송
+            ResponseBuilder.writeResponse(response, output);
+            System.out.println("응답 전송 완료\n");
+
+        } finally {
+            clientSocket.close();
+        }
+    }
+
+    /**
+     * 에러 상태 코드에 대한 간단한 HTML 페이지를 생성합니다.
+     */
+    private static String buildErrorPage(int statusCode, String statusMessage) {
+        return String.format(
+            "<html><head><title>%d %s</title></head>" +
+            "<body><h1>%d %s</h1></body></html>",
+            statusCode, statusMessage, statusCode, statusMessage
+        );
     }
 }

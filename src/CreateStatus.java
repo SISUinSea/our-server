@@ -1,7 +1,7 @@
 
 public class CreateStatus {
 	public static int returnStatus(HttpRequest request) {
-		if(request.getHttpVersion() != "HTTP/1.1")
+		if(!request.getHttpVersion().equals("HTTP/1.1"))
 			return 505;
 		switch(request.getMethod()) {
 		case "OPTIONS":
@@ -32,10 +32,18 @@ public class CreateStatus {
 	public static int returnStatusGet(HttpRequest request) {
 		if(request.getHeaders().containsKey("if-Modifided-Scince"))
 			return 304;
-		else if(FileManager.isFile(request.getUri()))
-			return 200;
-		else
-			return 404;
+		else {
+			String uri = request.getUri();
+			// 루트 경로(/)면 index.html로 변경
+			if(uri.equals("/")) {
+				uri = "/index.html";
+				request.setUri(uri);
+			}
+			if(FileManager.isFile(uri))
+				return 200;
+			else
+				return 404;
+		}
 	}
 	public static int returnStatusHead(HttpRequest request) {
 		

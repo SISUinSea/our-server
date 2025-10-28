@@ -2,6 +2,9 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -33,18 +36,16 @@ public class RequestParser {
         // 6. HttpRequest 객체 반환
 
         // 구현 힌트:
-        // BufferedReader reader = new BufferedReader(
-        //     new InputStreamReader(input, StandardCharsets.UTF_8));
-        //
-        // String requestLine = reader.readLine();
-        // HttpRequest request = new HttpRequest();
-        //
-        // parseRequestLine(requestLine, request);
-        // parseHeaders(reader, request);
-        //
-        // return request;
+         BufferedReader reader = new BufferedReader(
+             new InputStreamReader(input, StandardCharsets.UTF_8));
 
-        throw new UnsupportedOperationException("아직 구현되지 않음");
+         String requestLine = reader.readLine();
+         HttpRequest request = new HttpRequest();
+
+         parseRequestLine(requestLine, request);
+         parseHeaders(reader, request);
+
+         return request;
     }
 
     // ============================================
@@ -135,66 +136,81 @@ public class RequestParser {
     // 3번 팀원 담당 영역
     // ============================================
 
-    /**
-     * [3번 팀원 작업]
-     * HTTP 요청 헤더들을 파싱합니다.
-     *
-     * RFC 2616 Section 4.2 참고:
-     * message-header = field-name ":" [ field-value ]
-     *
-     * 입력 예시:
-     * "Host: localhost:8080"
-     * "User-Agent: Mozilla/5.0"
-     * "Accept: text/html"
-     * ""  ← 빈 줄이 헤더의 끝
-     *
-     * 출력: request.headers = {
-     *   "Host": "localhost:8080",
-     *   "User-Agent": "Mozilla/5.0",
-     *   "Accept": "text/html"
-     * }
-     *
-     * 구현 힌트:
-     * 1. BufferedReader로 한 줄씩 읽기
-     *    String line;
-     *    while ((line = reader.readLine()) != null) {
-     *
-     * 2. 빈 줄("")이 나올 때까지 반복
-     *    if (line.isEmpty()) {
-     *        break;  // 헤더 끝
-     *    }
-     *
-     * 3. 각 줄을 ":"로 split (주의: split(":", 2) 사용!)
-     *    String[] parts = line.split(":", 2);
-     *    if (parts.length == 2) {
-     *
-     * 4. 헤더 이름과 값을 trim()으로 공백 제거
-     *    String name = parts[0].trim();
-     *    String value = parts[1].trim();
-     *
-     * 5. Map에 저장
-     *    request.getHeaders().put(name, value);
-     *    }
-     *    }
-     *
-     * 주의사항:
-     * - split(":", 2)를 사용하세요 (값에 콜론이 있을 수 있음)
-     *   예: "Date: Mon, 27 Oct 2025 12:00:00 GMT"
-     * - trim()으로 앞뒤 공백 제거
-     * - 빈 줄이 나오면 반복 종료
-     *
-     * 예외 처리:
-     * - IOException: 네트워크 오류
-     *
-     * 예상 작업 시간: 3-4시간
-     *
-     * @param reader BufferedReader (요청 라인 다음부터 읽기)
-     * @param request 결과를 저장할 HttpRequest 객체
-     * @throws IOException 읽기 실패 시
-     */
-    public static void parseHeaders(BufferedReader reader, HttpRequest request)
-            throws IOException {
-        // TODO: 3번 팀원 구현
-        throw new UnsupportedOperationException("3번 팀원이 구현 필요");
+    public Map<String, String> parseHeaders(BufferedReader br) throws IOException {
+        // “String 이름표”와 “String 내용물”이 있는 서랍장을 새로 만든다.
+        Map<String, String> headers = new LinkedHashMap<>();
+
+        String line; // 한 줄씩 읽을 공간 준비
+
+        // 한 줄씩 읽기 시작
+        int count = 0;  // ← 추가: 읽은 헤더 줄 개수
+
+        // 한 줄씩 읽기 시작
+        // br.readLine() 입력 스트림에서 한 줄 읽기
+        while ((line = br.readLine()) != null) {
+            //한 줄씩 읽다가 더 이상 없으면 끝
+            if (line.isEmpty()) { // 빈 줄이면 헤더 끝
+                break;
+            }
+
+            //즉, : (콜론) 기준으로 왼쪽이 이름, 오른쪽이 값
+            //1️ 콜론 위치 찾기
+            //2️ 앞뒤 공백 제거(trim)
+            //3️ Map에 저장
+            //Host: localhost:8080
+            // (A) 추가: 헤더 줄 개수 제한 (예: 100줄)
+            if (++count > 100) {
+                throw new IOException("Too many header lines (limit 100)");
+            }
+
+            // (B) 추가: 콜론 없는 잘못된 줄은 무시
+            int idx = line.indexOf(':');
+            if (idx == -1) {
+                continue;
+            }  // 1️ 콜론(:) 위치 찾기
+            //line.indexOf(':') 문자열에서 콜론(:)이 어디 있는지 위치(번호)를 찾음
+
+            // 콜론이 있다면 (정상적인 헤더)
+
+            String name = line.substring(0, idx).trim();        // 2️ 이름 부분
+            // substring(0, idx) 그 위치 전까지의 문자열 (이름)
+
+            String value = line.substring(idx + 1).trim();      // 3️ 값 부분
+            // substring(idx + 1) 그 위치 다음부터 끝까지의 문자열 (값)
+            // trim() 앞뒤 공백 제거
+
+            String key = name.toLowerCase(Locale.ROOT);
+            // HTTP 헤더는 대소문자 구분 안 함. (Host == host == HOST)
+            // → 키를 소문자로 바꿔서 저장하면 해결됨.
+
+            // 4️ Map에 추가
+            // 이미 같은 이름의 헤더가 있으면 이어붙임
+            if (headers.containsKey(key)) {
+                headers.put(key, headers.get(key) + ", " + value);
+            } else {
+                headers.put(key, value);
+            }
+            // headers.put(name, value) Map에 이름(key)과 값(value)을 저장
+            // 이렇게 저장된 헤더 안에는 아래와 같이 저장됨
+            //"Host" → "localhost:8080"
+            //"User-Agent" → "Mozilla/5.0"
+        }
+
+        return headers;
     }
+
+    //  팀 뼈대(parseHeaders(BufferedReader, HttpRequest))와 바로 호환되도록 어댑터 제공
+// - 팀원이 정적 메서드로 호출해도 작동하도록 static으로 제공
+// - 네 기존 로직(Map 반환)을 그대로 재사용해서 HttpRequest에 채워 넣음
+    public static void parseHeaders(BufferedReader br, HttpRequest req) throws IOException {
+        RequestParser p = new RequestParser();        // 네 기존 인스턴스 메서드 재사용
+        Map<String, String> m = p.parseHeaders(br);
+
+        if (req.getHeaders() != null) {
+            req.getHeaders().putAll(m);
+        } else {
+            req.setHeaders(new LinkedHashMap<>(m));
+        }
+    }
+
 }

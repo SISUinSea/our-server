@@ -47,12 +47,15 @@ build/
 target/
 dist/
 
-# Gradle
+# Gradle (Gradle Wrapper는 커밋함)
 .gradle/
 gradle-app.setting
-!gradle-wrapper.jar
-!gradle-wrapper.properties
 .gradletasknamecache
+# Gradle Wrapper 파일들은 커밋 허용
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+!gradlew
+!gradlew.bat
 
 # OS files
 ### Mac OS ###

@@ -7,12 +7,13 @@ import java.io.IOException;
 public class FileManager {
 	static FileReader fin = null;
 	static BufferedReader br = null;
+	private static final String DOCUMENT_ROOT = "www";
+
 	public static boolean isFile(String uri) {
 		try {
-			fin = new FileReader(".." + uri);
+			fin = new FileReader(DOCUMENT_ROOT + uri);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// 파일을 찾지 못함
 			return false;
 		}
 		return true;
