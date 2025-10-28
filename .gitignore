@@ -47,6 +47,13 @@ build/
 target/
 dist/
 
+# Gradle
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+.gradletasknamecache
+
 # OS files
 ### Mac OS ###
 .DS_Store
