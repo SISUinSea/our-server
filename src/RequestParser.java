@@ -1,5 +1,9 @@
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 /**
  * HTTP 요청을 파싱하는 클래스
@@ -82,8 +86,49 @@ public class RequestParser {
      * @throws IllegalArgumentException 형식이 잘못된 경우
      */
     public static void parseRequestLine(String requestLine, HttpRequest request) {
-        // TODO: 2번 팀원 구현
-        throw new UnsupportedOperationException("2번 팀원이 구현 필요");
+        StringTokenizer st = new StringTokenizer(requestLine, " ");
+        // parts.length == 3인지 검증
+        if (st.countTokens() != 3) {
+            throw new IllegalArgumentException("request line의 형식이 잘못되었어요!");
+        }
+        request.setMethod(st.nextToken());
+        request.setUri(st.nextToken());
+        request.setHttpVersion(st.nextToken());
+        // method가 정의된 메소드인지 검증
+        if (!isValidMethod(request.getMethod())) {
+            throw new IllegalArgumentException(request.getMethod() +"는 정의되지 않은 method입니다.");
+        }
+        // httpVersion이 HTTP/1.1인지 확인
+        if (!request.getHttpVersion().equals("HTTP/1.1")) {
+            throw new IllegalArgumentException("지원하지 않는 HTTP 버전입니다. 지원 버전: HTTP/1.1");
+        }
+    }
+
+    /** method name이 아래 중 하나와 같은지 확인합니다.
+    *
+     * @param method 요청받은 request method
+     * @return boolean 아래의 method와 일치할 경우 true, 아닐 경우 false를 반환합니다.
+    *                   "OPTIONS"                ; Section 9.2
+                      | "GET"                    ; Section 9.3
+                      | "HEAD"                   ; Section 9.4
+                      | "POST"                   ; Section 9.5
+                      | "PUT"                    ; Section 9.6
+                      | "DELETE"                 ; Section 9.7
+                      | "TRACE"                  ; Section 9.8
+                      | "CONNECT"
+    */
+    private static boolean isValidMethod(String method) {
+        Set<String> methods = new HashSet<>(Arrays.asList(
+                "OPTIONS",
+                "GET",
+                "HEAD",
+                "POST",
+                "PUT",
+                "DELETE",
+                "TRACE",
+                "CONNECT"
+        ));
+        return methods.contains(method);
     }
 
     // ============================================
