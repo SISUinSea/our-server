@@ -26,44 +26,44 @@ public class ResponseBuilderTest {
 
         // TODO: 1번 팀원 작성
         // 1. HttpResponse 객체 생성
-        //    HttpResponse response = new HttpResponse();
+            HttpResponse response = new HttpResponse();
         //
         // 2. response.setStatusCode(200) 설정
-        //    response.setStatusCode(200);
+            response.setStatusCode(200);
         //
         // 3. buildStatusLine(response) 호출
-        //    try {
-        //        String statusLine = ResponseBuilder.buildStatusLine(response);
+           try {
+                String statusLine = ResponseBuilder.buildStatusLine(response);
         //
         // 4. 결과가 "HTTP/1.1 200 OK\r\n"인지 확인
-        //        String expected = "HTTP/1.1 200 OK\r\n";
-        //        if (expected.equals(statusLine)) {
-        //            System.out.println("✅ 200 상태 라인 생성 성공: " + statusLine.replace("\r\n", "\\r\\n"));
-        //        } else {
-        //            System.out.println("❌ 200 상태 라인 생성 실패");
-        //            System.out.println("   예상: " + expected.replace("\r\n", "\\r\\n"));
-        //            System.out.println("   실제: " + statusLine.replace("\r\n", "\\r\\n"));
-        //        }
+                String expected = "HTTP/1.1 200 OK\r\n";
+                if (expected.equals(statusLine)) {
+                    System.out.println("✅ 200 상태 라인 생성 성공: " + statusLine.replace("\r\n", "\\r\\n"));
+                } else {
+                    System.out.println("❌ 200 상태 라인 생성 실패");
+                    System.out.println("   예상: " + expected.replace("\r\n", "\\r\\n"));
+                    System.out.println("   실제: " + statusLine.replace("\r\n", "\\r\\n"));
+                }
         //
         // 5. 404 상태 코드 테스트
-        //        response.setStatusCode(404);
-        //        statusLine = ResponseBuilder.buildStatusLine(response);
-        //        expected = "HTTP/1.1 404 Not Found\r\n";
-        //        if (expected.equals(statusLine)) {
-        //            System.out.println("✅ 404 상태 라인 생성 성공: " + statusLine.replace("\r\n", "\\r\\n"));
-        //        } else {
-        //            System.out.println("❌ 404 상태 라인 생성 실패");
-        //        }
+                response.setStatusCode(404);
+                statusLine = ResponseBuilder.buildStatusLine(response);
+                expected = "HTTP/1.1 404 Not Found\r\n";
+                if (expected.equals(statusLine)) {
+                    System.out.println("✅ 404 상태 라인 생성 성공: " + statusLine.replace("\r\n", "\\r\\n"));
+                } else {
+                    System.out.println("❌ 404 상태 라인 생성 실패");
+                }
         //
         // 6. 500 상태 코드 테스트
-        //        response.setStatusCode(500);
-        //        statusLine = ResponseBuilder.buildStatusLine(response);
-        //        expected = "HTTP/1.1 500 Internal Server Error\r\n";
-        //        if (expected.equals(statusLine)) {
-        //            System.out.println("✅ 500 상태 라인 생성 성공: " + statusLine.replace("\r\n", "\\r\\n"));
-        //        } else {
-        //            System.out.println("❌ 500 상태 라인 생성 실패");
-        //        }
+                response.setStatusCode(500);
+                statusLine = ResponseBuilder.buildStatusLine(response);
+                expected = "HTTP/1.1 500 Internal Server Error\r\n";
+                if (expected.equals(statusLine)) {
+                    System.out.println("✅ 500 상태 라인 생성 성공: " + statusLine.replace("\r\n", "\\r\\n"));
+                } else {
+                    System.out.println("❌ 500 상태 라인 생성 실패");
+                }
         //
         // 7. HTML 본문 생성 테스트
         //        String html = ResponseBuilder.buildSimpleHtmlBody("Hello, World!");
@@ -73,11 +73,11 @@ public class ResponseBuilderTest {
         //            System.out.println("❌ HTML 본문 생성 실패");
         //        }
         //
-        //    } catch (Exception e) {
-        //        System.out.println("❌ 예외 발생: " + e.getMessage());
-        //        e.printStackTrace();
-        //    }
-
+            } catch (Exception e) {
+                System.out.println("❌ 예외 발생: " + e.getMessage());
+                e.printStackTrace();
+            }
+           
         System.out.println("TODO: 1번 팀원이 테스트 작성 필요\n");
     }
 

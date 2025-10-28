@@ -4,7 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class FileFinder {
+public class FileManager {
 	static FileReader fin = null;
 	static BufferedReader br = null;
 	public static boolean isFile(String uri) {
@@ -18,6 +18,7 @@ public class FileFinder {
 		return true;
 	}
 	public static String returnFile() throws IOException {
+	
 		if(fin == null)
 			return null;
 		StringBuilder html = new StringBuilder();

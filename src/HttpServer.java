@@ -73,9 +73,9 @@ public class HttpServer {
              int statusCode = CreateStatus.returnStatus(request);
              response.setStatusCode(statusCode);
              response.setStatusMessage(ResponseBuilder.getStatusMessage(statusCode));
-        
+             
              //파일 찾아서 저장
-             response.setBody(FileFinder.returnFile());
+             response.setBody(FileManager.returnFile());
         
              // 응답 전송
              ResponseBuilder.writeResponse(response, output);

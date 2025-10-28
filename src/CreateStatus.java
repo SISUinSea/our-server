@@ -32,7 +32,7 @@ public class CreateStatus {
 	public static int returnStatusGet(HttpRequest request) {
 		if(request.getHeaders().containsKey("if-Modifided-Scince"))
 			return 304;
-		else if(FileFinder.isFile(request.getUri()))
+		else if(FileManager.isFile(request.getUri()))
 			return 200;
 		else
 			return 404;
