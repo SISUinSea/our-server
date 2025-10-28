@@ -1,0 +1,22 @@
+// 플러그인 설정: 이 프로젝트가 'Java' 프로젝트임을 선언합니다.
+plugins {
+    id 'java'
+}
+
+// 라이브러리를 찾을 저장소 설정: Maven 중앙 저장소를 사용합니다.
+repositories {
+    mavenCentral()
+}
+
+// 의존성 설정: 프로젝트에 필요한 외부 라이브러리 목록을 정의합니다.
+dependencies {
+    // JUnit 5를 테스트(test) 용으로만 사용하겠다고 선언
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.3'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.3'
+}
+
+// 자바 버전 설정: 소스 코드 및 컴파일 결과의 호환 버전 설정
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
