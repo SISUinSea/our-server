@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>게시판</title>
+  <style>
+    :root {
+      --bg: #f7f7fb;
+      --fg: #111827;
+      --muted: #6b7280;
+      --brand: #4f46e5;
+      --brand-2: #7c3aed;
+      --card: #ffffff;
+      --shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
+      --radius: 16px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0b0e14;
+        --fg: #e5e7eb;
+        --muted: #9ca3af;
+        --card: #121722;
+        --shadow: 0 10px 30px rgba(0,0,0,0.35);
+      }
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Apple SD Gothic Neo, "맑은 고딕", sans-serif;
+      background: radial-gradient(1200px 600px at 70% -10%, rgba(79,70,229,0.08), transparent),
+                  radial-gradient(900px 500px at -10% 110%, rgba(124,58,237,0.08), transparent),
+                  var(--bg);
+      color: var(--fg);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .card {
+      width: 100%;
+      max-width: 520px;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+    .title {
+      font-size: 24px;
+      font-weight: 800;
+      margin: 0 0 6px;
+      letter-spacing: -0.02em;
+    }
+    .desc {
+      margin: 0 0 24px;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    @media (min-width: 520px) {
+      .actions { grid-template-columns: 1fr 1fr; }
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      border: 1px solid transparent;
+      transition: transform .06s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+      outline: none;
+      position: relative;
+    }
+    .btn:focus-visible {
+      box-shadow: 0 0 0 3px rgba(79,70,229,0.35);
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(79,70,229,0.35);
+    }
+    .btn-primary:hover { filter: brightness(1.04); }
+    .btn-outline {
+      background: transparent;
+      color: var(--fg);
+      border-color: rgba(148,163,184,0.35);
+    }
+    .btn-outline:hover {
+      background: rgba(148,163,184,0.08);
+      border-color: rgba(148,163,184,0.55);
+    }
+    footer {
+      margin-top: 16px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <main class="card" role="main" aria-labelledby="main-title">
+    <h1 id="main-title" class="title">미니 게시판</h1>
+    <p class="desc">아래 버튼으로 글을 확인하거나 새 글을 작성하세요.</p>
+    <nav class="actions" aria-label="주요 작업">
+      <!-- 서버 라우트는 필요에 맞게 변경하세요 -->
+      <a class="btn btn-outline" href="/posts" aria-label="글 목록 보기로 이동">글 목록 보기</a>
+      <a class="btn btn-primary" href="/write" aria-label="글 작성하기로 이동">글 작성하기</a>
+    </nav>
+    <footer>© 2025 Mini Board</footer>
+  </main>
+</body>
+</html>
