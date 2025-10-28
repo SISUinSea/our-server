@@ -18,7 +18,6 @@ public class FileManager {
 		return true;
 	}
 	public static String returnFile() throws IOException {
-	
 		if(fin == null)
 			return null;
 		StringBuilder html = new StringBuilder();
