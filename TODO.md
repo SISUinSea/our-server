@@ -46,11 +46,11 @@
 ### 2번 팀원 (예상 4-5시간)
 **파일**: `src/RequestParser.java`, `test/RequestParserTest.java`
 
-- [ ] **RequestParser.java 작업**
-  - [ ] `parseRequestLine()` 구현
-    - [ ] 문자열 split
-    - [ ] HttpRequest에 저장
-    - [ ] 예외 처리
+- [x] **RequestParser.java 작업**
+  - [x] `parseRequestLine()` 구현
+    - [x] 문자열 split
+    - [x] HttpRequest에 저장
+    - [x] 예외 처리
 
 - [ ] **RequestParserTest.java 작성**
   - [ ] 요청 라인 파싱 테스트
