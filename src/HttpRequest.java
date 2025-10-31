@@ -14,6 +14,7 @@ public class HttpRequest {
     private String uri;            // 예: "/index.html"
     private String httpVersion;    // 예: "HTTP/1.1"
     private Map<String, String> headers;  // 예: {"Host": "localhost:8080"}
+    private String body;
 
     public HttpRequest() {
         this.headers = new HashMap<>();
@@ -61,4 +62,12 @@ public class HttpRequest {
         return String.format("HttpRequest{method='%s', uri='%s', version='%s', headers=%s}",
             method, uri, httpVersion, headers);
     }
+
+	public String getBody() {
+		return body;
+	}
+
+	public void setBody(String body) {
+		this.body = body;
+	}
 }

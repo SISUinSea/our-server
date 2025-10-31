@@ -36,14 +36,24 @@ public class RequestParser {
         // 6. HttpRequest 객체 반환
 
         // 구현 힌트:
-         BufferedReader reader = new BufferedReader(
-             new InputStreamReader(input, StandardCharsets.UTF_8));
+    	BufferedInputStream reader = new BufferedInputStream(input);
+        //BufferedReader reader = new BufferedReader(
+        //     new InputStreamReader(bin, StandardCharsets.UTF_8));
 
-         String requestLine = reader.readLine();
+         String requestLine = readLine(reader);
          HttpRequest request = new HttpRequest();
-
+         
+         //요청라인 읽기
          parseRequestLine(requestLine, request);
+         //header 읽기
          parseHeaders(reader, request);
+         //header에 content-length 가 있으면 길이만큼 바디 읽기
+         String cl = request.getHeaders().get("content-length");
+         if (cl != null) {
+             int len = Integer.parseInt(cl);
+             // 바디는 문자 리더가 아니라 "원래 스트림"에서 읽어야 길이가 정확함
+             parseBody(reader, request, len);
+         }
 
          return request;
     }
@@ -103,6 +113,7 @@ public class RequestParser {
         if (!request.getHttpVersion().equals("HTTP/1.1")) {
             throw new IllegalArgumentException("지원하지 않는 HTTP 버전입니다. 지원 버전: HTTP/1.1");
         }
+        System.out.println("요청 라인 파싱 완료.");
     }
 
     /** method name이 아래 중 하나와 같은지 확인합니다.
@@ -136,7 +147,7 @@ public class RequestParser {
     // 3번 팀원 담당 영역
     // ============================================
 
-    public Map<String, String> parseHeaders(BufferedReader br) throws IOException {
+    public Map<String, String> parseHeaders(BufferedInputStream reader) throws IOException {
         // “String 이름표”와 “String 내용물”이 있는 서랍장을 새로 만든다.
         Map<String, String> headers = new LinkedHashMap<>();
 
@@ -147,7 +158,7 @@ public class RequestParser {
 
         // 한 줄씩 읽기 시작
         // br.readLine() 입력 스트림에서 한 줄 읽기
-        while ((line = br.readLine()) != null) {
+        while ((line = readLine(reader)) != null) {
             //한 줄씩 읽다가 더 이상 없으면 끝
             if (line.isEmpty()) { // 빈 줄이면 헤더 끝
                 break;
@@ -195,16 +206,16 @@ public class RequestParser {
             //"Host" → "localhost:8080"
             //"User-Agent" → "Mozilla/5.0"
         }
-
+    	System.out.println("헤더 파싱 완료.");
         return headers;
     }
 
     //  팀 뼈대(parseHeaders(BufferedReader, HttpRequest))와 바로 호환되도록 어댑터 제공
 // - 팀원이 정적 메서드로 호출해도 작동하도록 static으로 제공
 // - 네 기존 로직(Map 반환)을 그대로 재사용해서 HttpRequest에 채워 넣음
-    public static void parseHeaders(BufferedReader br, HttpRequest req) throws IOException {
+    public static void parseHeaders(BufferedInputStream reader, HttpRequest req) throws IOException {
         RequestParser p = new RequestParser();        // 네 기존 인스턴스 메서드 재사용
-        Map<String, String> m = p.parseHeaders(br);
+        Map<String, String> m = p.parseHeaders(reader);
 
         if (req.getHeaders() != null) {
             req.getHeaders().putAll(m);
@@ -212,5 +223,33 @@ public class RequestParser {
             req.setHeaders(new LinkedHashMap<>(m));
         }
     }
-
+    
+    public static void parseBody(InputStream in, HttpRequest req, int len) throws IOException {
+   	 	byte[] bodyBytes = in.readNBytes(len); // 정확히 len바이트 읽기
+        String body = new String(bodyBytes, StandardCharsets.UTF_8);
+        req.setBody(body);
+    	System.out.println("바디 파싱 완료.");
+    }
+    
+    private static String readLine(BufferedInputStream in) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        int prev = -1;
+        while (true) {
+            int b = in.read();
+            if (b == -1) {
+                break;
+            }
+            // \r\n 만나면 끝
+            if (prev == '\r' && b == '\n') {
+                break;
+            }
+            baos.write(b);
+            prev = b;
+        }
+        // CRLF 직전까지만 문자열로
+        String line = baos.toString(StandardCharsets.UTF_8);
+        // \r 로 끝나있을 수 있으니 제거
+        return line.replace("\r", "");
+    }
 }
+

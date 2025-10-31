@@ -1,11 +1,4 @@
-<!doctype html>
-<html lang="ko">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>글 목록 - 미니 게시판</title>
-  <style>
-    :root {
+:root {
       --bg: #f7f7fb;
       --fg: #111827;
       --muted: #6b7280;
@@ -82,7 +75,7 @@
     .post-item { border: 1px solid var(--border); border-radius: 12px; padding: 14px; background: transparent; }
     .post-title { font-weight: 800; letter-spacing: -0.01em; text-decoration: none; color: var(--fg); }
     .post-title:hover { text-decoration: underline; }
-    .meta { margin-top: 6px; color: var(--muted); font-size: 13px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .meta { margin-top: 6px; color: var(--muted); font-size: 13px; display: flex; gap: 10px; flex-wrap: wrap; float: right; }
     .meta .dot { opacity: .6; }
 
     .empty { margin: 8px 0 0; color: var(--muted); font-size: 14px; }
@@ -90,65 +83,3 @@
     .pager { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 14px; }
     .page { padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border); text-decoration: none; color: var(--fg); }
     .page[aria-current="page"], .page.current { background: rgba(79,70,229,0.12); border-color: rgba(79,70,229,0.45); font-weight: 800; }
-  </style>
-</head>
-<body>
-  <main class="card" role="main" aria-labelledby="page-title">
-    <header>
-      <h1 id="page-title" class="title">글 목록</h1>
-      <div class="actions">
-        <a class="btn btn-outline" href="/" aria-label="메인으로">홈</a>
-        <a class="btn btn-primary" href="/write" aria-label="글 작성하기로 이동">글 작성하기</a>
-      </div>
-    </header>
-    <p class="desc">최신 글부터 정렬됩니다.</p>
-
-    <!--
-      서버에서 글 배열(posts)을 루프 돌며 아래 <li class="post-item">를 렌더링하세요.
-      각 글 객체 예시: { id, title, author, createdAtISO, createdAtText, comments }
-      링크 규칙은 /posts/:id 형태로 가정했습니다. 필요시 바꾸세요.
-    -->
-    <ul class="post-list" id="post-list">
-      <!-- 예시 항목 (서버에서 교체 렌더링 권장) -->
-      <li class="post-item">
-        <a class="post-title" href="/posts/1">첫 번째 글 예시 제목</a>
-        <div class="meta">
-          <span>작성자: guest</span>
-          <span class="dot">·</span>
-          <time datetime="2025-10-28">2025-10-28</time>
-          <span class="dot">·</span>
-          <span aria-label="댓글 3개">💬 3</span>
-        </div>
-      </li>
-      <li class="post-item">
-        <a class="post-title" href="/posts/2">두 번째 글 예시 제목</a>
-        <div class="meta">
-          <span>작성자: admin</span>
-          <span class="dot">·</span>
-          <time datetime="2025-10-25">2025-10-25</time>
-          <span class="dot">·</span>
-          <span aria-label="댓글 0개">💬 0</span>
-        </div>
-      </li>
-    </ul>
-
-    <!-- 빈 목록 UI (서버에서 조건부로만 렌더링) -->
-    <!-- <p class="empty">아직 작성된 글이 없습니다. 첫 글을 작성해 보세요! ✨</p> -->
-
-    <!-- 페이지네이션: 서버에서 totalPages / currentPage에 맞게 렌더링 -->
-    <nav class="pager" aria-label="페이지 이동">
-      <a class="page" href="?page=1">« 처음</a>
-      <a class="page" href="?page=1">‹ 이전</a>
-      <a class="page" href="?page=1">1</a>
-      <a class="page current" href="?page=2" aria-current="page">2</a>
-      <a class="page" href="?page=3">3</a>
-      <a class="page" href="?page=3">다음 ›</a>
-      <a class="page" href="?page=10">마지막 »</a>
-    </nav>
-
-    <noscript>
-      <p class="empty">자바스크립트가 비활성화되어 있습니다. 서버 렌더링으로 목록을 제공합니다.</p>
-    </noscript>
-  </main>
-</body>
-</html>

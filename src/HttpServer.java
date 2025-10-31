@@ -52,30 +52,39 @@ public class HttpServer {
     private static void handleClient(Socket clientSocket) throws IOException {
         try (InputStream input = clientSocket.getInputStream();
              OutputStream output = clientSocket.getOutputStream()) {
-
             // 요청 파싱
+        	System.out.println("요청 파싱 시작.");
             HttpRequest request = RequestParser.parseRequest(input);
             System.out.println("요청 받음: " + request);
 
             // 응답 생성
+            System.out.println("응답 작성 시작.");
             HttpResponse response = new HttpResponse();
+            // 요청에 맞는 파일생성을 위한 파일 매니저 생성
+            FileManager FM = new FileManager();
+            CreateStatus CS = new CreateStatus();
 
             // 요청에 따라 응답 상태 코드 생성
-            int statusCode = CreateStatus.returnStatus(request);
+            int statusCode = CS.returnStatus(request, FM);
             response.setStatusCode(statusCode);
             response.setStatusMessage(ResponseBuilder.getStatusMessage(statusCode));
-
-            // 파일 찾아서 body에 저장 (200 OK일 때만)
+            System.out.printf("응답 코드 작성 완료. 응답 코드: %d\n", statusCode);
+            //요청이 head인지 구분
+        	response.setHead("HEAD".equals(request.getMethod()));
+        	
+            // 파일 찾아서 response body에 저장 (200 OK일 때만)
             if (statusCode == 200) {
-                response.setBody(FileManager.returnFile());
-            } else {
+            	response.setFileName(FM.returnFileName());
+            	response.setBody(FM.returnFile());
+            }
+            else{
                 // 에러 페이지 생성
+            	response.setFileName(null);
                 response.setBody(buildErrorPage(statusCode, ResponseBuilder.getStatusMessage(statusCode)));
             }
-
             // 응답 전송
-            ResponseBuilder.writeResponse(response, output);
-            System.out.println("응답 전송 완료\n");
+            ResponseBuilder.writeResponse(response, output, FM.getReDir());
+            System.out.println("응답 전송 완료.\n");
 
         } finally {
             clientSocket.close();

@@ -14,7 +14,9 @@ public class HttpResponse {
     private String statusMessage;              // 예: "OK", "Not Found"
     private Map<String, String> headers;       // 예: {"Content-Type": "text/html"}
     private String body;                       // 응답 본문 (HTML 등)
-
+    private String fileName = "";              // 파일명 ex) Main.html
+    private boolean head;
+    
     public HttpResponse() {
         this.headers = new HashMap<>();
     }
@@ -58,7 +60,23 @@ public class HttpResponse {
      */
     @Override
     public String toString() {
-        return String.format("HttpResponse{statusCode=%d, message='%s', headers=%s, bodyLength=%d}",
-            statusCode, statusMessage, headers, body != null ? body.length() : 0);
+        return String.format("HttpResponse{statusCode=%d, message='%s', headers=%s, bodyLength=%d, fileName=%s}",
+            statusCode, statusMessage, headers, body != null ? body.length() : 0, fileName);
     }
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String filePath) {
+		this.fileName = filePath;
+	}
+
+	public boolean isHead() {
+		return head;
+	}
+
+	public void setHead(boolean head) {
+		this.head = head;
+	}
 }

@@ -95,7 +95,7 @@ public class ResponseBuilderTest {
 
         try {
             // 헤더 생성
-            String headers = ResponseBuilder.buildHeaders(response);
+            String headers = ResponseBuilder.buildHeaders(response,"");
 
             // Content-Type
             if (headers.contains("Content-Type: text/html") &&
@@ -128,7 +128,7 @@ public class ResponseBuilderTest {
 
             // 전체 응답 쓰기 (상태라인+헤더+본문)
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            ResponseBuilder.writeResponse(response, out);
+            ResponseBuilder.writeResponse(response, out, "");
             String full = out.toString(StandardCharsets.ISO_8859_1);
 
             // 상태 라인
