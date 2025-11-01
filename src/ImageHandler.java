@@ -14,23 +14,6 @@ public class ImageHandler {
         reqPath = stripQuery(reqPath);
         if (reqPath == null || reqPath.isEmpty()) reqPath = "/";
 
-        // /images 또는 /images/ → 간단한 목록 페이지
-        if ("/images".equals(reqPath) || "/images/".equals(reqPath)) {
-            String html = "<!doctype html><meta charset='utf-8'>"
-                    + "<h1>Images</h1>"
-                    + "<ul>"
-                    + "<li><a href='/images/cat.jpeg'>고양이</a></li>"
-                    + "<li><a href='/images/dog.jpeg'>강아지</a></li>"
-                    + "<li><a href='/images/logo.jpeg'>로고</a></li>"
-                    + "</ul><p><a href='/'>← home</a></p>";
-
-            HttpResponse idx = new HttpResponse();
-            idx.setStatusCode(200);
-            idx.setBody(html);
-            ResponseBuilder.writeResponse(idx, output);
-            return true;
-        }
-
         // /images/<파일명> 아니면 처리 안 함
         if (!reqPath.startsWith("/images/")) return false;
 
