@@ -49,6 +49,9 @@ public class FileManager {
 	}
 
 	public String returnFileName() {
+		if (filePath == null) {
+			return "";
+		}
 		String []s = filePath.split("\\/");
 		return s[s.length-1];
 	}
