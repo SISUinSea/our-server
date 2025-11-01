@@ -337,17 +337,10 @@ public class ResponseBuilder {
                                            byte[] data,
                                            OutputStream output) throws IOException {
         // 상태 라인: 1번 파트가 구현돼 있으면 사용, 실패 시 폴백
-        String statusLine;
-        try {
-            HttpResponse tmp = new HttpResponse();
-            tmp.setStatusCode(statusCode);
-            statusLine = buildStatusLine(tmp);
-        } catch (Throwable t) {
-            String reason;
-            try { reason = getStatusMessage(statusCode); }
-            catch (Throwable t2) { reason = (statusCode == 200) ? "OK" : "Unknown"; }
-            statusLine = "HTTP/1.1 " + statusCode + " " + reason + "\r\n";
-        }
+        HttpResponse tmp = new HttpResponse();
+        tmp.setStatusCode(statusCode);
+        String statusLine = buildStatusLine(tmp);
+
 
         // 헤더 (바이너리는 data.length 그대로)
         StringBuilder headers = new StringBuilder(128);
