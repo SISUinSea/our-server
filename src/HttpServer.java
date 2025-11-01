@@ -78,14 +78,14 @@ public class HttpServer {
         	System.out.println("요청 파싱 시작.");
             HttpRequest request = RequestParser.parseRequest(input);
             System.out.println(threadId + " 요청: " + request.getMethod() + " " + request.getUri());
-
+            
             // 응답 생성
             System.out.println("응답 작성 시작.");
             HttpResponse response = new HttpResponse();
             // 요청에 맞는 파일생성을 위한 파일 매니저 생성
             FileManager FM = new FileManager();
             CreateStatus CS = new CreateStatus();
-
+            
             // 요청에 따라 응답 상태 코드 생성
             int statusCode = CS.returnStatus(request, FM);
             response.setStatusCode(statusCode);
@@ -93,11 +93,19 @@ public class HttpServer {
             System.out.printf("응답 코드 작성 완료. 응답 코드: %d\n", statusCode);
             //요청이 head인지 구분
         	response.setHead("HEAD".equals(request.getMethod()));
+        	response.setFileName(FM.returnFileName());
+        	String rfn = response.getFileName();
 
+    		response.setImg(rfn.endsWith(".jpg")||rfn.endsWith("png")||rfn.endsWith("gif"));
+        	
             // 파일 찾아서 response body에 저장 (200 OK일 때만)
             if (statusCode == 200) {
-            	response.setFileName(FM.returnFileName());
-            	response.setBody(FM.returnFile(request.getUri()));
+            	if(response.isImg()) {
+            		response.setImg(FM.returnImg(request.getUri()));
+            	}
+            	else {
+            		response.setBody(FM.returnFile(request.getUri()));
+            	}
             }
             else{
                 // 에러 페이지 생성
@@ -125,4 +133,6 @@ public class HttpServer {
             statusCode, statusMessage, statusCode, statusMessage
         );
     }
+    
+    
 }

@@ -171,6 +171,9 @@ public class ResponseBuilder {
         if (n.endsWith(".ico"))   return "image/x-icon";
         if (n.endsWith(".woff2")) return "font/woff2";
         if (n.endsWith(".txt"))   return "text/plain; charset=utf-8";
+        if (n.endsWith(".gif"))  return "image/gif";
+        if (n.endsWith(".ico"))  return "image/x-icon";
+        if (n.endsWith(".webp")) return "image/webp";
         return "application/octet-stream";
     }
 
@@ -230,7 +233,19 @@ public class ResponseBuilder {
     public static String buildHeaders(HttpResponse response, String dir) {
         String body = response.getBody();
         if (body == null) body = "";
-        int length = body.getBytes(StandardCharsets.UTF_8).length; 
+        
+        int length;
+        if(response.isImg()) {
+        	try {
+        		length = response.getImg().length;
+        	}
+        	catch(NullPointerException e) {
+        		length = body.getBytes(StandardCharsets.UTF_8).length;
+        	}
+        }
+        else {
+        	length = body.getBytes(StandardCharsets.UTF_8).length; 
+        }
 
         //파일 명으로 content-type 생성. 파일이 없으면 에러 페이지 전송
         String fileName = response.getFileName();
@@ -303,24 +318,28 @@ public class ResponseBuilder {
     public static void writeResponse(HttpResponse response, OutputStream output, String dir)
             throws IOException {
         // 상태 라인 (1번 파트 미구현이어도 동작하게 fallback 포함)
-        String statusLine;
-        try {
-            statusLine = buildStatusLine(response); // 1번 팀원 메서드
-        } catch (Throwable t) {
-            int code = response.getStatusCode();
-            String reason;
-            try { reason = getStatusMessage(code); }
-            catch (Throwable t2) { reason = (code == 200) ? "OK" : "Unknown"; }
-            statusLine = "HTTP/1.1 " + code + " " + reason + "\r\n";
-        }
+        String statusLine = buildStatusLine(response);
         System.out.print("응답 라인 작성 완료. 응답 라인: " + statusLine);
 
         String headers = buildHeaders(response, dir);
         System.out.print("헤더 작성 완료. 헤더:\n" + headers);
         
+        byte[] body;
         String bodyStr = response.getBody();
-        if (bodyStr == null) bodyStr = "";
-        byte[] body = bodyStr.getBytes(StandardCharsets.UTF_8);
+        System.out.println(bodyStr);
+        if(response.isImg()) {
+        	byte[] b = response.getImg();
+        	if(b == null)
+        		body = bodyStr.getBytes(StandardCharsets.UTF_8);
+        	else
+        		body = b;
+        }
+        else {
+            if (bodyStr == null) 
+            	bodyStr = "";
+            body = bodyStr.getBytes(StandardCharsets.UTF_8);
+        }
+        
         System.out.println("바디 작성 완료.");
         
         output.write(statusLine.getBytes(StandardCharsets.UTF_8));

@@ -1,14 +1,15 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -64,6 +65,19 @@ public class FileManager {
 		return s[s.length-1];
 	}
 
+	
+	public byte[] returnImg(String uri) throws IOException, InterruptedException {
+		Path base = Paths.get(DOCUMENT_ROOT + filePath);
+		Path target = base.normalize();
+		byte[] data = Files.readAllBytes(target);
+		
+		if (uri.contains("..")) {
+			throw new IllegalArgumentException("파일 탐색 범위를 벗어난 요청입니다.");
+		}
+		
+		return data;
+	}
+	
 	public String returnFile(String uri) throws IOException, InterruptedException {
 		if (uri.contains("..")) {
 			throw new IllegalArgumentException("파일 탐색 범위를 벗어난 요청입니다.");

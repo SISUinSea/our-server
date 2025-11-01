@@ -14,8 +14,10 @@ public class HttpResponse {
     private String statusMessage;              // 예: "OK", "Not Found"
     private Map<String, String> headers;       // 예: {"Content-Type": "text/html"}
     private String body;                       // 응답 본문 (HTML 등)
+    private byte[] img;						   // 이미지
     private String fileName = "";              // 파일명 ex) Main.html
     private boolean head;
+    private boolean isImg;
     
     public HttpResponse() {
         this.headers = new HashMap<>();
@@ -78,5 +80,21 @@ public class HttpResponse {
 
 	public void setHead(boolean head) {
 		this.head = head;
+	}
+
+	public byte[] getImg() {
+		return img;
+	}
+
+	public void setImg(byte[] bs) {
+		this.img = bs;
+	}
+
+	public boolean isImg() {
+		return isImg;
+	}
+
+	public void setImg(boolean isImg) {
+		this.isImg = isImg;
 	}
 }
