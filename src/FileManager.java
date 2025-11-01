@@ -64,7 +64,7 @@ public class FileManager {
 		return s[s.length-1];
 	}
 
-	public static String returnFile(String uri) throws IOException, InterruptedException {
+	public String returnFile(String uri) throws IOException, InterruptedException {
 		if (uri.contains("..")) {
 			throw new IllegalArgumentException("파일 탐색 범위를 벗어난 요청입니다.");
 		}
@@ -73,7 +73,7 @@ public class FileManager {
 			Thread.sleep(5000);
 			System.out.println("5초 지남 보낸다.");
 		}
-		FileReader fileReader = new FileReader(DOCUMENT_ROOT + uri);
+		FileReader fileReader = new FileReader(DOCUMENT_ROOT + filePath);
 		if(fileReader == null)
 			return null;
 		StringBuilder html = new StringBuilder();
@@ -84,7 +84,7 @@ public class FileManager {
 			read = br.readLine();
 			if(read == null)
 				break;
-			html.append(read);
+			html.append(read).append("\n");
 		}
 		fileReader.close();
 		br.close();

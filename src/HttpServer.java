@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 public class HttpServer {
 
     private static final int PORT = 8080;
-    private static final int THREAD_POOL_SIZE = 1;
+    private static final int THREAD_POOL_SIZE = 10;
 
     public static void main(String[] args) {
         // Thread Pool 생성
@@ -39,17 +39,17 @@ public class HttpServer {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("[연결] " + clientSocket.getInetAddress());
-                try {
-                	handleClient(clientSocket);
-                } catch (IOException e) {
-                    System.err.println("[에러] " + e.getMessage());
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+                
                 // 각 클라이언트를 별도 스레드에서 처리
-//                threadPool.execute(() -> {
-//                    
-//                });
+                threadPool.execute(() -> {
+                	try {
+                    	handleClient(clientSocket);
+                    } catch (IOException e) {
+                        System.err.println("[에러] " + e.getMessage());
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
             }
         } catch (IOException e) {
             System.err.println("서버 오류: " + e.getMessage());
