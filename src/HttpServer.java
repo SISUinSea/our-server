@@ -3,6 +3,8 @@ import java.net.Socket;
 import java.net.InetAddress;
 import java.io.*;
 import java.net.SocketTimeoutException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Simple HTTP Server
@@ -13,33 +15,45 @@ import java.net.SocketTimeoutException;
 public class HttpServer {
 
     private static final int PORT = 8080;
+    private static final int THREAD_POOL_SIZE = 10;
 
     public static void main(String[] args) {
-        // Day 1 전체 작업 (완성)
+        // Thread Pool 생성
+        ExecutorService threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             // 로컬 IP 주소 가져오기
             String localIP = InetAddress.getLocalHost().getHostAddress();
 
             // 서버 시작 메시지 출력
             System.out.println("========================================");
-            System.out.println("Simple HTTP Server");
+            System.out.println("Multi-threaded HTTP Server");
             System.out.println("========================================");
             System.out.println("접속 가능 주소: http://" + localIP + ":" + PORT);
             System.out.println("로컬 접속: http://localhost:" + PORT);
+            System.out.println("Thread Pool Size: " + THREAD_POOL_SIZE);
             System.out.println("========================================");
             System.out.println("서버가 시작되었습니다. 연결을 기다립니다...\n");
 
             // 무한 루프로 클라이언트 연결 대기
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("클라이언트 연결됨: " + clientSocket.getInetAddress());
-                handleClient(clientSocket);
+                System.out.println("[연결] " + clientSocket.getInetAddress());
+
+                // 각 클라이언트를 별도 스레드에서 처리
+                threadPool.execute(() -> {
+                    try {
+                        handleClient(clientSocket);
+                    } catch (IOException | InterruptedException e) {
+                        System.err.println("[에러] " + e.getMessage());
+                    }
+                });
             }
         } catch (IOException e) {
             System.err.println("서버 오류: " + e.getMessage());
             e.printStackTrace();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        } finally {
+            threadPool.shutdown();
         }
     }
 
@@ -53,12 +67,14 @@ public class HttpServer {
      * @throws IOException 네트워크 오류 시
      */
     private static void handleClient(Socket clientSocket) throws IOException, InterruptedException {
+        String threadId = "[Thread-" + Thread.currentThread().getId() + "]";
+
         try (InputStream input = clientSocket.getInputStream();
              OutputStream output = clientSocket.getOutputStream()) {
 
             // 요청 파싱
             HttpRequest request = RequestParser.parseRequest(input);
-            System.out.println("요청 받음: " + request);
+            System.out.println(threadId + " 요청: " + request.getMethod() + " " + request.getUri());
 
             // 응답 생성
             HttpResponse response = new HttpResponse();
@@ -70,7 +86,6 @@ public class HttpServer {
 
             // 파일 찾아서 body에 저장 (200 OK일 때만)
             if (statusCode == 200) {
-
                 response.setBody(FileManager.returnFile(request.getUri()));
             } else {
                 // 에러 페이지 생성
@@ -79,7 +94,7 @@ public class HttpServer {
 
             // 응답 전송
             ResponseBuilder.writeResponse(response, output);
-            System.out.println("응답 전송 완료\n");
+            System.out.println(threadId + " 응답 완료\n");
 
         } finally {
             clientSocket.close();
