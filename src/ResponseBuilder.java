@@ -337,30 +337,21 @@ public class ResponseBuilder {
                                            String contentType,
                                            byte[] data,
                                            OutputStream output) throws IOException {
-        // 상태 라인: 1번 파트가 구현돼 있으면 사용, 실패 시 폴백
-        String statusLine;
-        try {
-            HttpResponse tmp = new HttpResponse();
-            tmp.setStatusCode(statusCode);
-            statusLine = buildStatusLine(tmp);
-        } catch (Throwable t) {
-            String reason;
-            try { reason = getStatusMessage(statusCode); }
-            catch (Throwable t2) { reason = (statusCode == 200) ? "OK" : "Unknown"; }
-            statusLine = "HTTP/1.1 " + statusCode + " " + reason + "\r\n";
-        }
+    	//팀에서 만든 HttpResponse와 buildStatusLine을 사용해 표준 형식의 상태 라인을 생성
+    	//setStatusCode(statusCode)로 코드만 넣으면buildStatusLine(tmp)가 "HTTP/1.1 <code> <reason>\r\n" 형식의 문자열을 반환
+    	HttpResponse tmp = new HttpResponse();
+    	tmp.setStatusCode(statusCode);
+    	String statusLine = buildStatusLine(tmp);
 
         // 헤더 (바이너리는 data.length 그대로)
         StringBuilder headers = new StringBuilder(128);
         headers.append("Content-Type: ").append(contentType).append("\r\n");
         headers.append("Content-Length: ").append(data == null ? 0 : data.length).append("\r\n");
         headers.append("Connection: close\r\n");
-        headers.append("Cache-Control: max-age=3600\r\n"); // 선택(1시간 캐시)
         headers.append("Date: ")
                .append(java.time.ZonedDateTime.now(java.time.ZoneOffset.UTC)
                         .format(java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME))
                .append("\r\n");
-        headers.append("Server: SimpleHTTP/1.0\r\n");
         headers.append("\r\n");
 
         // 전송 (헤더는 ASCII, 바디는 바이너리)
