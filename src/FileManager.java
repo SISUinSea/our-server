@@ -23,11 +23,22 @@ public class FileManager {
 	private String reDir;
 
 
-	public static boolean isFile(String uri) {
+	public boolean isFile(String uri) {
+		System.out.println(uri);
+		//?뒤의 요청은 추가 요청사항으로 처리
+		String[] ulist =  uri.split("\\?",2);
+		//파일 경로
+		filePath = ulist[0];
+		try {
+			extraRequest = ulist[1];
+		} catch(ArrayIndexOutOfBoundsException e) {
+			//?가 없으면 비워두기
+			extraRequest = "";
+		}
 		if (uri.contains("..")) {
 			throw new IllegalArgumentException("파일 탐색 범위를 벗어난 요청입니다.");
 		}
-		File file = new File(DOCUMENT_ROOT+uri);
+		File file = new File(DOCUMENT_ROOT, filePath);
 		return file.exists() && file.isFile();
 	}
 
@@ -49,9 +60,6 @@ public class FileManager {
 	}
 
 	public String returnFileName() {
-		if (filePath == null) {
-			return "";
-		}
 		String []s = filePath.split("\\/");
 		return s[s.length-1];
 	}
