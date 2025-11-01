@@ -9,7 +9,6 @@ import java.util.Map;
  */
 public class HttpRequest {
 
-    // Day 1 전체 작업 - 필드 정의 (완성)
     private String method;         // 예: "GET", "POST"
     private String uri;            // 예: "/index.html"
     private String httpVersion;    // 예: "HTTP/1.1"
@@ -19,46 +18,37 @@ public class HttpRequest {
         this.headers = new HashMap<>();
     }
 
-    // Day 1 전체 작업 - getter/setter 생성 (완성)
+    public String getMethod() { return method; }
+    public void setMethod(String method) { this.method = method; }
 
-    public String getMethod() {
-        return method;
+    public String getUri() { return uri; }
+    public void setUri(String uri) { this.uri = uri; }
+
+    public String getHttpVersion() { return httpVersion; }
+    public void setHttpVersion(String httpVersion) { this.httpVersion = httpVersion; }
+
+    public Map<String, String> getHeaders() { return headers; }
+    public void setHeaders(Map<String, String> headers) { this.headers = headers; }
+
+    /** 호환용: handleClient에서 path라고 부르므로 alias 제공 */
+    public String getPath() { return getUri(); }
+
+    /** 대소문자 무시 단일 헤더 조회 (If-None-Match/If-Modified-Since 등 캐치) */
+    public String getHeader(String name) {
+        if (name == null) return null;
+        String v = headers.get(name);
+        if (v != null) return v;
+        for (Map.Entry<String, String> e : headers.entrySet()) {
+            if (e.getKey() != null && e.getKey().equalsIgnoreCase(name)) {
+                return e.getValue();
+            }
+        }
+        return null;
     }
 
-    public void setMethod(String method) {
-        this.method = method;
-    }
-
-    public String getUri() {
-        return uri;
-    }
-
-    public void setUri(String uri) {
-        this.uri = uri;
-    }
-
-    public String getHttpVersion() {
-        return httpVersion;
-    }
-
-    public void setHttpVersion(String httpVersion) {
-        this.httpVersion = httpVersion;
-    }
-
-    public Map<String, String> getHeaders() {
-        return headers;
-    }
-
-    public void setHeaders(Map<String, String> headers) {
-        this.headers = headers;
-    }
-
-    /**
-     * 디버깅용 toString 메서드
-     */
     @Override
     public String toString() {
         return String.format("HttpRequest{method='%s', uri='%s', version='%s', headers=%s}",
-            method, uri, httpVersion, headers);
+                method, uri, httpVersion, headers);
     }
 }

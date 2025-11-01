@@ -15,6 +15,9 @@ public class HttpResponse {
     private Map<String, String> headers;       // 예: {"Content-Type": "text/html"}
     private String body;                       // 응답 본문 (HTML 등)
 
+    // ✅ 추가: 요청 메서드 저장용 (HEAD/304 처리에 필요)
+    private String requestMethod;
+
     public HttpResponse() {
         this.headers = new HashMap<>();
     }
@@ -53,12 +56,30 @@ public class HttpResponse {
         this.body = body;
     }
 
+    // ✅ 추가: 개별 헤더 조작용 메서드
+    public void setHeader(String name, String value) {
+        this.headers.put(name, value);
+    }
+
+    public String getHeader(String name) {
+        return this.headers.get(name);
+    }
+
+    // ✅ 추가: 요청 메서드 getter/setter
+    public String getRequestMethod() {
+        return requestMethod;
+    }
+
+    public void setRequestMethod(String method) {
+        this.requestMethod = method;
+    }
+
     /**
      * 디버깅용 toString 메서드
      */
     @Override
     public String toString() {
         return String.format("HttpResponse{statusCode=%d, message='%s', headers=%s, bodyLength=%d}",
-            statusCode, statusMessage, headers, body != null ? body.length() : 0);
+                statusCode, statusMessage, headers, body != null ? body.length() : 0);
     }
 }
