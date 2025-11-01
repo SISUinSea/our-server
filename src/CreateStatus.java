@@ -30,7 +30,7 @@ public class CreateStatus {
 	}
 	//요청이 GET일 때 반환하는 상태 코드
 	public static int returnStatusGet(HttpRequest request) {
-		if(request.getHeaders().containsKey("if-Modifided-Scince"))
+		if(request.getHeaders().containsKey("if-Modifided-Since"))
 			return 304;
 		else {
 			String uri = request.getUri();
