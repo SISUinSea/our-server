@@ -2,6 +2,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.InetAddress;
 import java.io.*;
+import java.net.SocketTimeoutException;
 
 /**
  * Simple HTTP Server
@@ -37,6 +38,8 @@ public class HttpServer {
         } catch (IOException e) {
             System.err.println("서버 오류: " + e.getMessage());
             e.printStackTrace();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -49,7 +52,7 @@ public class HttpServer {
      * @param clientSocket 클라이언트 소켓
      * @throws IOException 네트워크 오류 시
      */
-    private static void handleClient(Socket clientSocket) throws IOException {
+    private static void handleClient(Socket clientSocket) throws IOException, InterruptedException {
         try (InputStream input = clientSocket.getInputStream();
              OutputStream output = clientSocket.getOutputStream()) {
 
@@ -67,7 +70,8 @@ public class HttpServer {
 
             // 파일 찾아서 body에 저장 (200 OK일 때만)
             if (statusCode == 200) {
-                response.setBody(FileManager.returnFile());
+
+                response.setBody(FileManager.returnFile(request.getUri()));
             } else {
                 // 에러 페이지 생성
                 response.setBody(buildErrorPage(statusCode, ResponseBuilder.getStatusMessage(statusCode)));
