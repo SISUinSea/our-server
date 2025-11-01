@@ -1,17 +1,17 @@
 
 public class CreateStatus {
-	public static int returnStatus(HttpRequest request) {
+	public int returnStatus(HttpRequest request, FileManager FM) {
 		if(!request.getHttpVersion().equals("HTTP/1.1"))
 			return 505;
 		switch(request.getMethod()) {
 		case "OPTIONS":
 			return returnStatusOptions(request);
 		case "GET":
-			return returnStatusGet(request);
+			return returnStatusGet(request, FM);
 		case "HEAD":
-			return returnStatusHead(request);
+			return returnStatusGet(request, FM);
 		case "POST":
-			return returnStatusPost(request);
+			return returnStatusPost(request, FM);
 		case "PUT":
 			return returnStatusPut(request);
 		case "DELETE":
@@ -25,11 +25,10 @@ public class CreateStatus {
 		}
 	}
 	public static int returnStatusOptions(HttpRequest request) {
-		
-		return 500;
+		return 501;
 	}
 	//요청이 GET일 때 반환하는 상태 코드
-	public static int returnStatusGet(HttpRequest request) {
+	public static int returnStatusGet(HttpRequest request, FileManager FM) {
 		if(request.getHeaders().containsKey("if-Modifided-Since"))
 			return 304;
 		else {
@@ -39,34 +38,28 @@ public class CreateStatus {
 				uri = "/index.html";
 				request.setUri(uri);
 			}
-			if(FileManager.isFile(uri))
+			if(FM.isFile(uri))
 				return 200;
 			else
 				return 404;
 		}
 	}
-	public static int returnStatusHead(HttpRequest request) {
-		
-		return 500;
-	}
-	public static int returnStatusPost(HttpRequest request) {
-		
-		return 500;
+	public static int returnStatusPost(HttpRequest request, FileManager FM) {
+		if(!FM.isFolder(request.getUri()))
+			return 404;
+		return FM.makeFile(request.getBody());
 	}
 	public static int returnStatusPut(HttpRequest request) {
-		
-		return 500;
+		return 501;
 	}
 	public static int returnStatusDelete(HttpRequest request) {
-		
-		return 500;
+		return 501;
 	}
 	public static int returnStatusTrace(HttpRequest request) {
-	
-		return 500;
+		return 501;
 	}
 	public static int returnStatusConnect(HttpRequest request) {
 	
-		return 500;
+		return 501;
 	}
 }

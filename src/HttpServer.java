@@ -27,7 +27,7 @@ public class HttpServer {
 
             // 서버 시작 메시지 출력
             System.out.println("========================================");
-            System.out.println("Multi-threaded HTTP Server");
+            System.out.println("Simple HTTP Server");
             System.out.println("========================================");
             System.out.println("접속 가능 주소: http://" + localIP + ":" + PORT);
             System.out.println("로컬 접속: http://localhost:" + PORT);
@@ -44,8 +44,10 @@ public class HttpServer {
                 threadPool.execute(() -> {
                     try {
                         handleClient(clientSocket);
-                    } catch (IOException | InterruptedException e) {
+                    } catch (IOException e) {
                         System.err.println("[에러] " + e.getMessage());
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
                     }
                 });
             }
@@ -73,29 +75,41 @@ public class HttpServer {
              OutputStream output = clientSocket.getOutputStream()) {
 
             // 요청 파싱
+        	System.out.println("요청 파싱 시작.");
             HttpRequest request = RequestParser.parseRequest(input);
             System.out.println(threadId + " 요청: " + request.getMethod() + " " + request.getUri());
 
             // 응답 생성
+            System.out.println("응답 작성 시작.");
             HttpResponse response = new HttpResponse();
+            // 요청에 맞는 파일생성을 위한 파일 매니저 생성
+            FileManager FM = new FileManager();
+            CreateStatus CS = new CreateStatus();
 
             // 요청에 따라 응답 상태 코드 생성
-            int statusCode = CreateStatus.returnStatus(request);
+            int statusCode = CS.returnStatus(request, FM);
             response.setStatusCode(statusCode);
             response.setStatusMessage(ResponseBuilder.getStatusMessage(statusCode));
+            System.out.printf("응답 코드 작성 완료. 응답 코드: %d\n", statusCode);
+            //요청이 head인지 구분
+        	response.setHead("HEAD".equals(request.getMethod()));
 
-            // 파일 찾아서 body에 저장 (200 OK일 때만)
+            // 파일 찾아서 response body에 저장 (200 OK일 때만)
             if (statusCode == 200) {
-                response.setBody(FileManager.returnFile(request.getUri()));
-            } else {
+            	response.setFileName(FM.returnFileName());
+            	response.setBody(FM.returnFile(request.getUri()));
+            }
+            else{
                 // 에러 페이지 생성
+            	response.setFileName(null);
                 response.setBody(buildErrorPage(statusCode, ResponseBuilder.getStatusMessage(statusCode)));
             }
-
             // 응답 전송
-            ResponseBuilder.writeResponse(response, output);
-            System.out.println(threadId + " 응답 완료\n");
+            ResponseBuilder.writeResponse(response, output, FM.getReDir());
+            System.out.println("응답 전송 완료.\n");
 
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         } finally {
             clientSocket.close();
         }

@@ -1,0 +1,17 @@
+yes
+date: 2025-10-30T17:45:00+09:00
+
+no
+no
+yes
+yes
+no
+yes
+no
+no
+
+yes
+no
+no
+yes
+no

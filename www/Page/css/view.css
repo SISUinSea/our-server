@@ -1,11 +1,4 @@
-<!doctype html>
-<html lang="ko">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>글 작성하기 - 미니 게시판</title>
-  <style>
-    :root {
+:root {
       --bg: #f7f7fb;
       --fg: #111827;
       --muted: #6b7280;
@@ -67,60 +60,47 @@
     .btn-outline { background: transparent; color: var(--fg); border-color: var(--border); }
     .btn-outline:hover { background: rgba(148,163,184,0.08); border-color: rgba(148,163,184,0.55); }
 
-    form.post-form { display: grid; gap: 12px; margin-top: 6px; }
-    .field { display: grid; gap: 6px; }
-    label { font-weight: 700; }
-    input[type="text"], textarea {
-      width: 100%; padding: 12px 14px; border-radius: 12px;
+    article.post { margin-top: 4px; }
+    .post-title { font-size: 26px; font-weight: 900; letter-spacing: -0.02em; margin: 0 0 10px; }
+    .post-body { white-space: pre-wrap; line-height: 1.7; font-size: 16px; }
+
+    .divider { height: 1px; background: var(--border); margin: 18px 0; }
+
+    .comments h2 { font-size: 18px; margin: 0 0 10px; }
+    .comment-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+    .comment { border: 1px solid var(--border); border-radius: 12px; padding: 12px; background: transparent; }
+    .comment p { margin: 0; white-space: pre-wrap; line-height: 1.6; }
+
+    form.comment-form { display: grid; gap: 10px; margin-top: 14px; }
+    textarea {
+      width: 100%; min-height: 110px; padding: 12px; border-radius: 12px;
       border: 1px solid var(--border); background: rgba(255,255,255,0.6);
       outline: none; color: var(--fg);
     }
     @media (prefers-color-scheme: dark) {
-      input[type="text"], textarea { background: rgba(18,23,34,0.6); }
+      textarea { background: rgba(18,23,34,0.6); }
     }
-    input[type="text"]:focus, textarea:focus {
-      box-shadow: 0 0 0 3px rgba(79,70,229,0.25); border-color: rgba(79,70,229,0.55);
+    textarea:focus { box-shadow: 0 0 0 3px rgba(79,70,229,0.25); border-color: rgba(79,70,229,0.55); }
+    .submit {
+      justify-self: end;
+      cursor: pointer;
     }
-    textarea { min-height: 220px; line-height: 1.6; }
-    .hint { color: var(--muted); font-size: 13px; }
-    .row { display: flex; gap: 8px; justify-content: flex-end; }
-    .submit { cursor: pointer; }
-  </style>
-</head>
-<body>
-  <main class="card" role="main" aria-labelledby="page-title">
-    <header>
-      <h1 id="page-title" class="title">글 작성하기</h1>
-      <div class="actions">
-        <a class="btn btn-outline" href="/posts" aria-label="목록으로">목록</a>
-        <a class="btn btn-outline" href="/" aria-label="메인으로">홈</a>
-      </div>
-    </header>
+.line-wrap {
+  position: relative;
+  margin-top: 12px; /* 제목이랑 선 사이 여백 */
+}
 
-    <!-- 서버에서 제출을 처리하세요. 기본 가정: POST /posts 로 {title, body} 수신 후 생성 -->
-    <form class="post-form" id="post-form" method="post" action="/posts">
-      <!-- CSRF가 필요한 프레임워크에서는 토큰 필드를 추가하세요. -->
-      <div class="field">
-        <label for="title">제목</label>
-        <input id="title" name="title" type="text" placeholder="제목을 입력하세요" required maxlength="120" autofocus />
-        <p class="hint">최대 120자.</p>
-      </div>
+.divider {
+  height: 1px;
+  background: #e5e7eb;   /* 선 색 */
+}
 
-      <div class="field">
-        <label for="body">본문</label>
-        <textarea id="body" name="body" placeholder="내용을 입력하세요" required></textarea>
-        <p class="hint">줄바꿈이 그대로 저장·표시됩니다.</p>
-      </div>
-
-      <div class="row">
-        <a class="btn btn-outline" href="/posts" aria-label="취소하고 목록으로">취소</a>
-        <button class="btn btn-primary submit" type="submit">작성 완료</button>
-      </div>
-    </form>
-
-    <noscript>
-      <p style="color: var(--muted); font-size: 14px;">자바스크립트 없이도 동작합니다. 서버가 제출을 처리합니다.</p>
-    </noscript>
-  </main>
-</body>
-</html>
+.meta {
+  position: absolute;
+  right: 0;
+  top: -10px;            /* 이 값으로 “선 위로” 얼마나 올릴지 조절 */
+  background: #fff;      /* 선 위에 글자가 올라가도 선이 비치지 않게 */
+  padding: 0 6px;
+  font-size: 13px;
+  color: var(--muted);
+}

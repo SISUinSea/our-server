@@ -159,42 +159,21 @@ public class ResponseBuilder {
     	return String.format("HTTP/1.1 %d %s\r\n", response.getStatusCode(), getStatusMessage(response.getStatusCode()));
         //throw new UnsupportedOperationException("1번 팀원이 구현 필요");
     }
-
-    /**
-     * [1번 팀원 작업]
-     * 간단한 HTML 본문을 생성합니다.
-     *
-     * 입력: message = "Hello, World!"
-     * 출력: "<html><head><title>Simple HTTP Server</title></head>
-     *        <body><h1>Hello, World!</h1></body></html>"
-     *
-     * 구현 힌트:
-     * StringBuilder html = new StringBuilder();
-     * html.append("<html>");
-     * html.append("<head><title>Simple HTTP Server</title></head>");
-     * html.append("<body>");
-     * html.append("<h1>").append(message).append("</h1>");
-     * html.append("</body>");
-     * html.append("</html>");
-     * return html.toString();
-     *
-     * 또는 String.format() 사용:
-     * return String.format(
-     *     "<html><head><title>Simple HTTP Server</title></head>" +
-     *     "<body><h1>%s</h1></body></html>",
-     *     message
-     * );
-     *
-     * 예상 작업 시간: 1시간
-     *
-     * @param message 표시할 메시지
-     * @return HTML 문자열
-     */
-    public static String buildSimpleHtmlBody(String message) {
-        // TODO: 1번 팀원 구현
-    	
-        throw new UnsupportedOperationException("1번 팀원이 구현 필요");
+    
+    public static String guessContentType(String n) {
+        if (n.endsWith(".css"))   return "text/css; charset=utf-8";
+        if (n.endsWith(".js"))    return "application/javascript; charset=utf-8";
+        if (n.endsWith(".html"))  return "text/html; charset=utf-8";
+        if (n.endsWith(".json"))  return "application/json; charset=utf-8";
+        if (n.endsWith(".svg"))   return "image/svg+xml";
+        if (n.endsWith(".png"))   return "image/png";
+        if (n.endsWith(".jpg") || n.endsWith(".jpeg")) return "image/jpeg";
+        if (n.endsWith(".ico"))   return "image/x-icon";
+        if (n.endsWith(".woff2")) return "font/woff2";
+        if (n.endsWith(".txt"))   return "text/plain; charset=utf-8";
+        return "application/octet-stream";
     }
+
 
     // ============================================
     // 4번 팀원 담당 영역
@@ -248,13 +227,27 @@ public class ResponseBuilder {
      * @param response HttpResponse 객체
      * @return 헤더 문자열
      */
-    public static String buildHeaders(HttpResponse response) {
+    public static String buildHeaders(HttpResponse response, String dir) {
         String body = response.getBody();
         if (body == null) body = "";
         int length = body.getBytes(StandardCharsets.UTF_8).length; 
 
+        //파일 명으로 content-type 생성. 파일이 없으면 에러 페이지 전송
+        String fileName = response.getFileName();
+        String contentType;
+        if (fileName != null) {
+            contentType = guessContentType(fileName);
+        }
+        else {
+            // 에러 페이지나 동적 페이지일 때
+            contentType = "text/html; charset=utf-8";
+        }
+        
         StringBuilder headers = new StringBuilder(128);
-        headers.append("Content-Type: text/html; charset=UTF-8\r\n"); 
+        if (dir!=null) {
+            headers.append("Location: ").append(dir).append("\r\n");
+        }
+        headers.append("Content-Type: ").append(contentType).append("\r\n");
         headers.append("Content-Length: ").append(length).append("\r\n");
         headers.append("Connection: close\r\n");
         headers.append("Date: ")
@@ -307,7 +300,7 @@ public class ResponseBuilder {
      * @param output 클라이언트 소켓의 OutputStream
      * @throws IOException 쓰기 실패 시
      */
-    public static void writeResponse(HttpResponse response, OutputStream output)
+    public static void writeResponse(HttpResponse response, OutputStream output, String dir)
             throws IOException {
         // 상태 라인 (1번 파트 미구현이어도 동작하게 fallback 포함)
         String statusLine;
@@ -320,15 +313,22 @@ public class ResponseBuilder {
             catch (Throwable t2) { reason = (code == 200) ? "OK" : "Unknown"; }
             statusLine = "HTTP/1.1 " + code + " " + reason + "\r\n";
         }
+        System.out.print("응답 라인 작성 완료. 응답 라인: " + statusLine);
 
-        String headers = buildHeaders(response);
+        String headers = buildHeaders(response, dir);
+        System.out.print("헤더 작성 완료. 헤더:\n" + headers);
+        
         String bodyStr = response.getBody();
         if (bodyStr == null) bodyStr = "";
         byte[] body = bodyStr.getBytes(StandardCharsets.UTF_8);
-
+        System.out.println("바디 작성 완료.");
+        
         output.write(statusLine.getBytes(StandardCharsets.UTF_8));
         output.write(headers.getBytes(StandardCharsets.UTF_8));
-        output.write(body);
+        //head 요청이면 body 안보내기
+        if (!response.isHead()) {
+            output.write(body);
+        }
         output.flush();
     }
 
