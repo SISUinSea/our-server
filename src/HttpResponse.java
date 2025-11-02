@@ -15,7 +15,8 @@ public class HttpResponse {
     private Map<String, String> headers;       // 예: {"Content-Type": "text/html"}
     private String body;                       // 응답 본문 (HTML 등)
     private byte[] img;						   // 이미지
-    private String fileName = "";              // 파일명 ex) Main.html
+    private String fileName;              // 파일명 ex) Main.html
+    private String lastModified;				   // 마지막으로 수정된 시간
     private boolean head;
     private boolean isImg;
     
@@ -96,5 +97,13 @@ public class HttpResponse {
 
 	public void setImg(boolean isImg) {
 		this.isImg = isImg;
+	}
+
+	public String getLastModified() {
+		return lastModified;
+	}
+
+	public void setLastModified(String lastModified) {
+		this.lastModified = lastModified;
 	}
 }

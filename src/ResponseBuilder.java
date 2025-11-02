@@ -1,5 +1,9 @@
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * HTTP 응답을 생성하는 클래스
@@ -8,10 +12,6 @@ import java.nio.charset.StandardCharsets;
  * 4번 팀원: 응답 헤더 생성 (buildHeaders, writeResponse)
  */
 public class ResponseBuilder {
-    // ============================================
-    // 1번 팀원 담당 영역
-    // ============================================
-
     /**
      * [1번 팀원 작업]
      * 상태 코드에 해당하는 상태 메시지를 반환합니다.
@@ -160,6 +160,7 @@ public class ResponseBuilder {
         //throw new UnsupportedOperationException("1번 팀원이 구현 필요");
     }
     
+    //파일 명에 따라서 헤더 매핑
     public static String guessContentType(String n) {
         if (n.endsWith(".css"))   return "text/css; charset=utf-8";
         if (n.endsWith(".js"))    return "application/javascript; charset=utf-8";
@@ -231,11 +232,14 @@ public class ResponseBuilder {
      * @return 헤더 문자열
      */
     public static String buildHeaders(HttpResponse response, String dir) {
+    	//response에서 body 가져오기. 
         String body = response.getBody();
         if (body == null) body = "";
         
+        //파일 크기 구하기. 요청한 파일이 이미지면 이미지 길이 구하기. 
         int length;
         if(response.isImg()) {
+        	//이미지를 요청했지만 실제로 파일이 없는 경우 에러 페이지를 전송.
         	try {
         		length = response.getImg().length;
         	}
@@ -246,7 +250,7 @@ public class ResponseBuilder {
         else {
         	length = body.getBytes(StandardCharsets.UTF_8).length; 
         }
-
+        
         //파일 명으로 content-type 생성. 파일이 없으면 에러 페이지 전송
         String fileName = response.getFileName();
         String contentType;
@@ -259,9 +263,13 @@ public class ResponseBuilder {
         }
         
         StringBuilder headers = new StringBuilder(128);
+        
+        //303일 경우 경로 설정됨.
         if (dir!=null) {
             headers.append("Location: ").append(dir).append("\r\n");
         }
+        if(response.getLastModified() != null)
+        	headers.append("Last-Modified: ").append(response.getLastModified()).append("\r\n");
         headers.append("Content-Type: ").append(contentType).append("\r\n");
         headers.append("Content-Length: ").append(length).append("\r\n");
         headers.append("Connection: close\r\n");
@@ -326,7 +334,6 @@ public class ResponseBuilder {
         
         byte[] body;
         String bodyStr = response.getBody();
-        System.out.println(bodyStr);
         if(response.isImg()) {
         	byte[] b = response.getImg();
         	if(b == null)
@@ -350,5 +357,5 @@ public class ResponseBuilder {
         }
         output.flush();
     }
-
+    
 }

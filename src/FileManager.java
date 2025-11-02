@@ -10,9 +10,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,6 +45,48 @@ public class FileManager {
 		File file = new File(DOCUMENT_ROOT, filePath);
 		return file.exists() && file.isFile();
 	}
+	public int isFile(String uri, String time) {
+		System.out.println(uri);
+		//?뒤의 요청은 추가 요청사항으로 처리
+		String[] ulist =  uri.split("\\?",2);
+		//파일 경로
+		filePath = ulist[0];
+		try {
+			extraRequest = ulist[1];
+		} catch(ArrayIndexOutOfBoundsException e) {
+			//?가 없으면 비워두기
+			extraRequest = "";
+		}
+		if (uri.contains("..")) {
+			throw new IllegalArgumentException("파일 탐색 범위를 벗어난 요청입니다.");
+		}
+		File file = new File(DOCUMENT_ROOT, filePath);
+		if(!file.exists()) {
+			// 파일이 없으면 원래 404 흐름으로 가야 하니까
+			return 404;
+		}
+		
+		long fileLastModMillis = file.lastModified();
+        if (fileLastModMillis <= 0L) {
+            // 수정 시간이 없으면 비교 불가 → 새로 보냄
+            return 200;
+        }
+        
+     // 파일 시간: 밀리초 → Instant
+        Instant fileLastMod = Instant.ofEpochMilli(fileLastModMillis);
+
+        // 헤더 시간 파싱 (HTTP는 RFC_1123_DATE_TIME)
+        Instant clientInstant;
+        try {
+            clientInstant = ZonedDateTime
+                    .parse(time, DateTimeFormatter.RFC_1123_DATE_TIME)
+                    .toInstant();
+        } catch (DateTimeParseException e) {
+            // 파싱 실패하면 그냥 새로 보내는 쪽으로
+            return 200;
+        }
+		return 304;
+	}
 
 	public boolean isFolder(String uri) {
 		System.out.println(uri);
@@ -55,6 +100,9 @@ public class FileManager {
 			//?가 없으면 비워두기
 			extraRequest = "";
 		}
+		if (uri.contains("..")) {
+			throw new IllegalArgumentException("파일 탐색 범위를 벗어난 요청입니다.");
+		}
 		File f = new File(DOCUMENT_ROOT, filePath);
 		// 3) 진짜로 그런 경로가 서버에 있냐
 		return f.exists();
@@ -64,16 +112,23 @@ public class FileManager {
 		String []s = filePath.split("\\/");
 		return s[s.length-1];
 	}
-
+	
+	public String returnFileModified() {
+		File f = new File(DOCUMENT_ROOT + filePath);
+		long lastModMillis = f.lastModified();   // 0보다 크면 수정시간 있음
+		String lastModHttp = ZonedDateTime
+		        .ofInstant(Instant.ofEpochMilli(lastModMillis), ZoneOffset.UTC)
+		        .format(DateTimeFormatter.RFC_1123_DATE_TIME);
+		return lastModHttp;
+	}
 	
 	public byte[] returnImg(String uri) throws IOException, InterruptedException {
-		Path base = Paths.get(DOCUMENT_ROOT + filePath);
-		Path target = base.normalize();
-		byte[] data = Files.readAllBytes(target);
-		
 		if (uri.contains("..")) {
 			throw new IllegalArgumentException("파일 탐색 범위를 벗어난 요청입니다.");
 		}
+		Path base = Paths.get(DOCUMENT_ROOT + filePath);
+		Path target = base.normalize();
+		byte[] data = Files.readAllBytes(target);
 		
 		return data;
 	}

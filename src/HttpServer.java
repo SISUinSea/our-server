@@ -77,7 +77,7 @@ public class HttpServer {
             // 요청 파싱
         	System.out.println("요청 파싱 시작.");
             HttpRequest request = RequestParser.parseRequest(input);
-            System.out.println(threadId + " 요청: " + request.getMethod() + " " + request.getUri());
+            System.out.println(threadId + " 요청: " + request.getMethod() + " " + request.getUri() + "\n" + request.getHeaders());
             
             // 응답 생성
             System.out.println("응답 작성 시작.");
@@ -96,7 +96,7 @@ public class HttpServer {
         	response.setFileName(FM.returnFileName());
         	String rfn = response.getFileName();
 
-    		response.setImg(rfn.endsWith(".jpg")||rfn.endsWith("png")||rfn.endsWith("gif"));
+    		response.setImg(rfn.endsWith(".jpg")||rfn.endsWith("png")||rfn.endsWith("gif")||rfn.endsWith(".jpeg")||rfn.endsWith(".ico")||rfn.endsWith(".webp"));
         	
             // 파일 찾아서 response body에 저장 (200 OK일 때만)
             if (statusCode == 200) {
@@ -106,6 +106,7 @@ public class HttpServer {
             	else {
             		response.setBody(FM.returnFile(request.getUri()));
             	}
+            	response.setLastModified(FM.returnFileModified());
             }
             else{
                 // 에러 페이지 생성
