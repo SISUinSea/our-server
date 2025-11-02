@@ -357,5 +357,37 @@ public class ResponseBuilder {
         }
         output.flush();
     }
-    
+
+    public static void writeBinaryResponse(int statusCode,
+                                           String contentType,
+                                           byte[] data,
+                                           OutputStream output) throws IOException {
+        // 상태 라인: 1번 파트가 구현돼 있으면 사용, 실패 시 폴백
+        HttpResponse tmp = new HttpResponse();
+        tmp.setStatusCode(statusCode);
+        String statusLine = buildStatusLine(tmp);
+
+
+        // 헤더 (바이너리는 data.length 그대로)
+        StringBuilder headers = new StringBuilder(128);
+        headers.append("Content-Type: ").append(contentType).append("\r\n");
+        headers.append("Content-Length: ").append(data == null ? 0 : data.length).append("\r\n");
+        headers.append("Connection: close\r\n");
+        headers.append("Cache-Control: max-age=3600\r\n"); // 선택(1시간 캐시)
+        headers.append("Date: ")
+                .append(java.time.ZonedDateTime.now(java.time.ZoneOffset.UTC)
+                        .format(java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME))
+                .append("\r\n");
+        headers.append("Server: SimpleHTTP/1.0\r\n");
+        headers.append("\r\n");
+
+        // 전송 (헤더는 ASCII, 바디는 바이너리)
+        output.write(statusLine.getBytes(java.nio.charset.StandardCharsets.US_ASCII));
+        output.write(headers.toString().getBytes(java.nio.charset.StandardCharsets.US_ASCII));
+        if (data != null && data.length > 0) {
+            output.write(data);
+        }
+        output.flush();
+    }
+
 }
